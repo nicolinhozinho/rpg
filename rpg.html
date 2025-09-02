@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Puzzle RPG</title>
+<style>
+    body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: black;
+        color: white;
+        font-family: monospace;
+        text-align: center;
+        flex-direction: column;
+    }
+
+    input, select, button {
+        margin-top: 20px;
+        padding: 10px;
+        font-size: 18px;
+        text-transform: uppercase;
+    }
+
+    #matrix {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+    }
+
+    .hidden {
+        display: none;
+    }
+</style>
+</head>
+<body>
+
+<div id="question-container">
+    <div id="question">ASSIM GIRA O...</div>
+    <input type="text" id="answer" placeholder="RESPOSTA AQUI">
+    <button onclick="checkFirstAnswer()">ENVIAR</button>
+</div>
+
+<div id="matrix-container" class="hidden">
+    <canvas id="matrix"></canvas>
+    <div id="question2-container">
+        <div id="question2">QUAL SEU PERSONAGEM FAVORITO?</div>
+        <select id="character">
+            <option value="">ESCOLHA SEU PERSONAGEM</option>
+            <option>ALZIRA</option>
+            <option>AMÉLIA</option>
+            <option>BARTOLOMEU</option>
+            <option>BORIS</option>
+            <option>CAP. KREVIN</option>
+            <option>DAVY</option>
+            <option>EDWARD</option>
+            <option>FERNANDO</option>
+            <option>HARRY</option>
+            <option>KENJI</option>
+            <option>LEÔNCIO</option>
+            <option>MACIOTA</option>
+            <option>MARCO</option>
+            <option>SR. VERÍSSIMO</option>
+            <option>THOMAS</option>
+            <option>TOTANZ</option>
+            <option>FILIPE</option>
+        </select>
+        <button onclick="checkCharacter()">ENVIAR</button>
+    </div>
+</div>
+
+<div id="result" class="hidden"></div>
+
+<script>
+function checkFirstAnswer() {
+    const answer = document.getElementById("answer").value.toUpperCase().trim();
+    if (answer === "CARROSSEL") {
+        document.getElementById("question-container").classList.add("hidden");
+        document.getElementById("matrix-container").classList.remove("hidden");
+        startMatrix();
+    } else {
+        alert("RESPOSTA INCORRETA. TENTE NOVAMENTE.");
+    }
+}
+
+function checkCharacter() {
+    const char = document.getElementById("character").value.toUpperCase();
+    let message = "";
+
+    const group1 = ["FERNANDO", "BORIS", "MARCO", "FILIPE"];
+    const group2 = ["EDWARD", "DAVY", "THOMAS"];
+    const group3 = ["ALZIRA", "AMÉLIA"];
+    const group4 = ["HARRY", "LEÔNCIO"];
+    const group5 = ["TOTANZ", "BARTOLOMEU", "MACIOTA"];
+    const group6 = ["KENJI", "CAP. KREVIN"];
+    const group7 = ["SR. VERÍSSIMO", "CORONEL"];
+
+    if (group1.includes(char)) {
+        message = "FELIZ ANIVERSÁRIO DE 2 ANOS DE RPG!\nPARABÉNS! VOCÊ GANHOU +5 EM RESISTÊNCIA CONTRA DANO.";
+    } else if (group2.includes(char)) {
+        message = "FELIZ ANIVERSÁRIO DE 2 ANOS DE RPG!\nPARABÉNS, VOCÊ GANHOU +1 ATRIBUTO DE PRESENÇA.";
+    } else if (group3.includes(char)) {
+        message = "FELIZ ANIVERSÁRIO DE 2 ANOS DE RPG!\nPARABÉNS! VOCÊ GANHOU 1 RITUAL DE CONHECIMENTO À SUA ESCOLHA.";
+    } else if (group4.includes(char)) {
+        message = "FELIZ ANIVERSÁRIO DE 2 ANOS DE RPG!\nPARABÉNS! VOCÊ GANHOU 1 EQUIPAMENTO DE CATEGORIA IV EXTRA À SUA ESCOLHA.";
+    } else if (group5.includes(char)) {
+        message = "FELIZ ANIVERSÁRIO DE 2 ANOS DE RPG!\nPARABÉNS! VOCÊ GANHOU UMA MALDIÇÃO/PODER PARANORMAL EXTRA À SUA ESCOLHA.";
+    } else if (group6.includes(char)) {
+        message = "FELIZ ANIVERSÁRIO DE 2 ANOS DE RPG!\nPARABÉNS! VOCÊ GANHOU +5 DE DANO NOS SEUS ATAQUES.";
+    } else if (group7.includes(char)) {
+        message = "FELIZ ANIVERSÁRIO DE 2 ANOS DE RPG!\nPARABÉNS! VOCÊ GANHOU +5% DE EXPOSIÇÃO PARANORMAL.";
+    } else {
+        alert("SELECIONE UM PERSONAGEM VÁLIDO.");
+        return;
+    }
+
+    document.getElementById("question2-container").classList.add("hidden");
+    const resultDiv = document.getElementById("result");
+    resultDiv.innerText = message + "\n\nTIRE PRINT DO SEU PRÊMIO E ENVIE NO GRUPO DO RPG PARA RESGATÁ-LO.";
+    resultDiv.classList.remove("hidden");
+}
+
+// Efeito Matrix estilo Rainbow
+function startMatrix() {
+    const canvas = document.getElementById("matrix");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()*&^%";
+    const fontSize = 20;
+    const columns = canvas.width / fontSize;
+
+    const drops = [];
+    for (let x = 0; x < columns; x++) drops[x] = Math.random() * canvas.height;
+
+    function draw() {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        for (let i = 0; i < drops.length; i++) {
+            const color = `hsl(${Math.floor(Math.random() * 360)}, 100%, 50%)`;
+            ctx.fillStyle = color;
+            const text = letters[Math.floor(Math.random() * letters.length)];
+            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+            if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+            drops[i]++;
+        }
+    }
+
+    setInterval(draw, 50);
+}
+</script>
+
+</body>
+</html>
